@@ -25,8 +25,9 @@ class MyApp extends StatelessWidget {
 class Bucket {
   String job; // 할 일
   bool isDone;
+  bool isCompleted;
 
-  Bucket(this.job, this.isDone); // 생성자
+  Bucket(this.job, this.isDone, {this.isCompleted = false}); // 생성자
 }
 
 /// 홈 페이지
@@ -46,6 +47,18 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text("버킷 리스트"),
         backgroundColor: Colors.brown,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => CheckPage(bucketList: bucketList)),
+              );
+            },
+            icon: Icon(Icons.check),
+          ),
+        ],
       ),
       body: bucketList.isEmpty
           ? Center(
@@ -88,11 +101,14 @@ class _HomePageState extends State<HomePage> {
                         if (bucket.isDone) {
                           // 버튼이 눌렸을 때, 해당 항목을 리스트의 가장 아래로 이동시킴
                           Bucket completedBucket = bucketList.removeAt(index);
+                          completedBucket.isCompleted = true;
                           bucketList.add(completedBucket);
                         }
                       });
                     },
-                    color: bucket.isDone ? Colors.green : Colors.brown,
+                    color: bucket.isDone
+                        ? Color.fromARGB(255, 2, 121, 6)
+                        : Colors.brown,
                   ),
                 );
               },
@@ -155,21 +171,59 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class CheckPage extends StatelessWidget {
-  final String pageId;
+class CheckPage extends StatefulWidget {
+  final List<Bucket> bucketList;
 
-  const CheckPage({required this.pageId, Key? key}) : super(key: key);
+  const CheckPage({Key? key, required this.bucketList}) : super(key: key);
 
   @override
+  State<CheckPage> createState() => _CheckPageState();
+}
+
+class _CheckPageState extends State<CheckPage> {
+  @override
   Widget build(BuildContext context) {
+    List<Bucket> complitedBucketList =
+        widget.bucketList.where((bucket) => bucket.isDone).toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Check Page"),
+        title: Text("완료된 버킷리스트"),
         backgroundColor: Colors.brown,
+        leading: IconButton(
+          icon: Icon(
+            CupertinoIcons.chevron_back,
+            color: Colors.white, // 아이콘 버튼의 색상 지정
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
-      body: Center(
-        child: Text("Check Page - $pageId"),
-      ),
+      body: complitedBucketList.isEmpty
+          ? Center(
+              child: Text(
+                "완료된 버킷리스트가 없습니다.",
+                style: TextStyle(
+                  fontSize: 35, // 폰트 크기 조정
+                ),
+              ),
+            )
+          : ListView.builder(
+              itemCount: complitedBucketList.length,
+              itemBuilder: (context, index) {
+                Bucket bucket = complitedBucketList[index];
+                return ListTile(
+                  title: Text(
+                    bucket.job,
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Color.fromARGB(255, 2, 107, 25),
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }
