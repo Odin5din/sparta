@@ -89,14 +89,19 @@ class _HomePageState extends State<HomePage> {
                           bucket.job,
                           style: TextStyle(
                             fontSize: 30,
-                            color: bucket.isDone ? Colors.grey : Colors.black,
+                            color: bucket.isDone
+                                ? Color.fromARGB(255, 2, 107, 25)
+                                : Colors.black,
                             decoration: bucket.isDone
                                 ? TextDecoration.lineThrough
                                 : TextDecoration.none,
                           ),
                         ),
                         trailing: IconButton(
-                          icon: Icon(CupertinoIcons.delete),
+                          icon: Icon(
+                            CupertinoIcons.delete,
+                            color: Color.fromARGB(255, 160, 15, 4),
+                          ),
                           onPressed: () {
                             showDeleteDialog(context, index);
                           },
