@@ -60,59 +60,70 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: bucketList.isEmpty
-          ? Center(
-              child: Text(
-                "버킷 리스트를 작성해 주세요.",
-                style: TextStyle(
-                  fontSize: 35, // 폰트 크기 조정
-                ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: bucketList.length, // bucketList 개수 만큼 보여주기
-              itemBuilder: (context, index) {
-                Bucket bucket = bucketList[index]; // index에 해당하는 bucket 가져오기
-
-                return ListTile(
-                  // 버킷 리스트 할 일
-                  title: Text(
-                    bucket.job,
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: bucket.isDone ? Colors.grey : Colors.black,
-                      decoration: bucket.isDone
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
+      body: Column(
+        children: [
+          Image.network(
+            'https://media.istockphoto.com/id/1133968850/ko/%EC%82%AC%EC%A7%84/%EC%83%88-%ED%95%B4-%ED%95%B4%EC%83%81%EB%8F%84-%EA%B0%9C%EB%85%90%EC%9E%85%EB%8B%88%EB%8B%A4.jpg?s=1024x1024&w=is&k=20&c=G830XEFK-v7vC-rxrtWNpESCxxsklfe1vaX7owdYZD4=',
+            width: double.infinity,
+            height: 200,
+            fit: BoxFit.cover,
+          ),
+          SizedBox(height: 20),
+          Expanded(
+            child: bucketList.isEmpty
+                ? Center(
+                    child: Text(
+                      "버킷 리스트를 작성해 주세요.",
+                      style: TextStyle(
+                        fontSize: 35,
+                      ),
                     ),
-                  ),
-                  // 삭제 아이콘 버튼
-                  trailing: IconButton(
-                    icon: Icon(CupertinoIcons.delete),
-                    onPressed: () {
-                      showDeleteDialog(context, index);
+                  )
+                : ListView.builder(
+                    itemCount: bucketList.length,
+                    itemBuilder: (context, index) {
+                      Bucket bucket = bucketList[index];
+
+                      return ListTile(
+                        title: Text(
+                          bucket.job,
+                          style: TextStyle(
+                            fontSize: 30,
+                            color: bucket.isDone ? Colors.grey : Colors.black,
+                            decoration: bucket.isDone
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none,
+                          ),
+                        ),
+                        trailing: IconButton(
+                          icon: Icon(CupertinoIcons.delete),
+                          onPressed: () {
+                            showDeleteDialog(context, index);
+                          },
+                        ),
+                        leading: IconButton(
+                          icon: Icon(Icons.check_box),
+                          onPressed: () {
+                            setState(() {
+                              bucket.isDone = !bucket.isDone;
+                              if (bucket.isDone) {
+                                Bucket completedBucket =
+                                    bucketList.removeAt(index);
+                                completedBucket.isCompleted = true;
+                                bucketList.add(completedBucket);
+                              }
+                            });
+                          },
+                          color: bucket.isDone
+                              ? Color.fromARGB(255, 2, 121, 6)
+                              : Colors.brown,
+                        ),
+                      );
                     },
                   ),
-                  leading: IconButton(
-                    icon: Icon(Icons.check_box),
-                    onPressed: () {
-                      setState(() {
-                        bucket.isDone = !bucket.isDone;
-                        if (bucket.isDone) {
-                          // 버튼이 눌렸을 때, 해당 항목을 리스트의 가장 아래로 이동시킴
-                          Bucket completedBucket = bucketList.removeAt(index);
-                          completedBucket.isCompleted = true;
-                          bucketList.add(completedBucket);
-                        }
-                      });
-                    },
-                    color: bucket.isDone
-                        ? Color.fromARGB(255, 2, 121, 6)
-                        : Colors.brown,
-                  ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
         onPressed: () async {
@@ -200,30 +211,45 @@ class _CheckPageState extends State<CheckPage> {
           },
         ),
       ),
-      body: complitedBucketList.isEmpty
-          ? Center(
-              child: Text(
-                "완료된 버킷리스트가 없습니다.",
-                style: TextStyle(
-                  fontSize: 35, // 폰트 크기 조정
-                ),
-              ),
-            )
-          : ListView.builder(
-              itemCount: complitedBucketList.length,
-              itemBuilder: (context, index) {
-                Bucket bucket = complitedBucketList[index];
-                return ListTile(
-                  title: Text(
-                    bucket.job,
-                    style: TextStyle(
-                      fontSize: 30,
-                      color: Color.fromARGB(255, 2, 107, 25),
-                    ),
-                  ),
-                );
-              },
+      body: Column(
+        children: [
+          SizedBox(
+            height: 200,
+            child: Image.network(
+              'https://www.shutterstock.com/image-illustration/isometric-3d-illustration-on-blue-600w-1800922156.jpg',
+              width: double.infinity,
+              fit: BoxFit.cover,
             ),
+          ),
+          SizedBox(height: 20),
+          Expanded(
+            child: complitedBucketList.isEmpty
+                ? Center(
+                    child: Text(
+                      "완료된 버킷리스트가 없습니다.",
+                      style: TextStyle(
+                        fontSize: 35, // 폰트 크기 조정
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: complitedBucketList.length,
+                    itemBuilder: (context, index) {
+                      Bucket bucket = complitedBucketList[index];
+                      return ListTile(
+                        title: Text(
+                          bucket.job,
+                          style: TextStyle(
+                            fontSize: 30,
+                            color: Color.fromARGB(255, 2, 107, 25),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+          ),
+        ],
+      ),
     );
   }
 }
