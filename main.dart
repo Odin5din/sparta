@@ -116,6 +116,11 @@ class _HomePageState extends State<HomePage> {
                                     bucketList.removeAt(index);
                                 completedBucket.isCompleted = true;
                                 bucketList.add(completedBucket);
+                              } else {
+                                Bucket completedBucket =
+                                    bucketList.removeAt(index);
+                                completedBucket.isCompleted = false;
+                                bucketList.insert(0, completedBucket);
                               }
                             });
                           },
