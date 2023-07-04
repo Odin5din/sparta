@@ -199,8 +199,11 @@ class _CheckPageState extends State<CheckPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("완료된 버킷리스트"),
-        backgroundColor: Colors.brown,
+        title: Text(
+          "완료된 버킷리스트",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Color.fromARGB(255, 2, 107, 25),
         leading: IconButton(
           icon: Icon(
             CupertinoIcons.chevron_back,
@@ -228,7 +231,8 @@ class _CheckPageState extends State<CheckPage> {
                     child: Text(
                       "완료된 버킷리스트가 없습니다.",
                       style: TextStyle(
-                        fontSize: 35, // 폰트 크기 조정
+                        fontSize: 35,
+                        color: Color.fromARGB(255, 2, 107, 25), // 폰트 크기 조정
                       ),
                     ),
                   )
