@@ -1,0 +1,72 @@
+package com.example.myapplication
+
+class Calculator {
+    var result: Double = 0.0
+
+    fun add(a: Double, b:Double) {
+        result = a + b
+    }
+
+    fun subtract(a: Double, b:Double) {
+        result = a - b
+    }
+
+    fun multiply(a: Double, b:Double) {
+        result = a * b
+    }
+
+    fun divide(a: Double, b:Double){
+        if (b != 0.0) {
+            result = a / b
+        } else{
+            throw IllegalArgumentException("0으로 나눌 수 없습니다.")
+        }
+    }
+} //7월 17일 작성
+
+fun main() {
+    val calculator = Calculator()
+
+    print("연산을 선택하세요 (+, -, *, /): ")
+    val operator = readLine()
+
+    if (operator == "+" || operator == "-" || operator == "*" || operator == "/") {
+        print("첫 번째 숫자를 입력하세요 ")
+        val operand1 = readOperand()
+
+        print("두 번째 숫자를 입력하세요 ")
+        val operand2 = readOperand()
+
+        try {
+            when (operator) {
+                "+" -> {
+                    calculator.add(operand1, operand2)
+                    println("덧셈 결과: $operand1 더하기 $operand2 = ${calculator.result} 입니다.")
+                }
+                "-" -> {
+                    calculator.subtract(operand1, operand2)
+                    println("뺄셈 결과: $operand1 빼기 $operand2 = ${calculator.result} 입니다.")
+                }
+                "*" -> {
+                    calculator.multiply(operand1, operand2)
+                    println("곱셈 결과: $operand1 곱하기 $operand2 = ${calculator.result} 입니다.")
+                }
+                "/" -> {
+                    calculator.divide(operand1, operand2)
+                    println("나눗셈 결과: $operand1 나누기 $operand2 = ${calculator.result} 입니다.")
+                }
+            }
+        } catch (e: IllegalArgumentException) {
+            println("에러: ${e.message}")
+        }
+    } else {
+        println("잘못된 연산자입니다.")
+    }
+}
+
+
+fun readOperand(): Double {
+    print(" : ")
+    return readLine()?.toDoubleOrNull() ?: throw IllegalArgumentException("유효한 숫자를 입력해주세요.")
+}
+//7월 18일 작성
