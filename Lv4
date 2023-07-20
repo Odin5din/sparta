@@ -1,0 +1,80 @@
+package com.example.myapplication
+
+abstract class AbstractOperation {
+    abstract fun operate(a: Double, b: Double): Double
+}
+
+class AddOperation : AbstractOperation() {
+    override fun operate(a: Double, b: Double): Double {
+        return a + b
+    }
+}
+
+class SubtractOperation : AbstractOperation() {
+    override fun operate(a: Double, b: Double): Double {
+        return a - b
+    }
+}
+
+class MultiplyOperation : AbstractOperation() {
+    override fun operate(a: Double, b: Double): Double {
+        return a * b
+    }
+}
+
+class DivideOperation : AbstractOperation() {
+    override fun operate(a: Double, b: Double): Double {
+        if (b != 0.0) {
+            return a / b
+        } else {
+            throw IllegalArgumentException("0으로 나눌 수 없습니다.")
+        }
+    }
+}
+
+class Calculator {
+    var result: Double = 0.0
+
+    fun calculate(operation: AbstractOperation, a: Double, b: Double) {
+        result = operation.operate(a, b)
+    }
+}
+
+fun main() {
+    val calculator = Calculator()
+
+    print("연산을 선택하세요 (+, -, *, /): ")
+    val operator = readLine()
+
+    val operation = when (operator) {
+        "+" -> AddOperation()
+        "-" -> SubtractOperation()
+        "*" -> MultiplyOperation()
+        "/" -> DivideOperation()
+        else -> null
+    }
+
+    if (operation != null) {
+        print("첫 번째 숫자를 입력하세요 ")
+        val operand1 = readOperand()
+
+        print("두 번째 숫자를 입력하세요 ")
+        val operand2 = readOperand()
+
+        try {
+            calculator.calculate(operation, operand1, operand2)
+            println("연산 결과: $operand1 $operator $operand2 = ${calculator.result} 입니다.")
+        } catch (e: IllegalArgumentException) {
+            println("에러: ${e.message}")
+        }
+    } else {
+        println("잘못된 연산자입니다.")
+    }
+}
+
+fun readOperand(): Double {
+    print(" : ")
+    return readLine()?.toDoubleOrNull() ?: throw IllegalArgumentException("유효한 숫자를 입력해주세요.")
+}
+
+// 7월 19일 작성
