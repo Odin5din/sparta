@@ -1,0 +1,332 @@
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.random.Random
+
+data class ReservationData(
+    var name: String,
+    var roomNumber: String,
+    var checkInDate: Date,
+    var checkOutDate: Date,
+    val totalPrice: Int,
+    val randomAmount: Int
+)
+
+abstract class AbstractClass {
+    abstract fun performAction(vararg strings: String)
+}
+
+class Reservation : AbstractClass() {
+    private val reservations = mutableListOf<ReservationData>()
+
+    override fun performAction(vararg strings: String) {
+        println("호텔 예약이 완료되었습니다.")
+    }
+
+    fun calculateTotalPrice(checkInDate: Date, checkOutDate: Date): Int {
+        return Random.nextInt(10000, 100000)
+    }
+
+    fun calculateRandomAmount(totalPrice: Int): Int {
+        return totalPrice + Random.nextInt(100000, 1000000)
+    }
+
+    fun validateInput(name: String, roomNumber: String, checkInDate: String, checkOutDate: String, reservations: List<ReservationData>): Boolean {
+        val roomNum = roomNumber.toIntOrNull()
+        if (name.isBlank() || roomNum == null || roomNum !in 100..999) {
+            println("올바른 형식이 아닙니다. 다시 입력해주세요.")
+            return false
+        }
+
+        var checkInDateParsed: Date? = null
+        var checkOutDateParsed: Date? = null
+
+        val format = SimpleDateFormat("yyyyMMdd")
+        format.isLenient = false
+
+        try {
+            checkInDateParsed = format.parse(checkInDate)
+            checkOutDateParsed = format.parse(checkOutDate)
+        } catch (e: Exception) {
+            println("잘못된 날짜 형식입니다. 날짜는 20230720과 같은 형식으로 입력해주세요.")
+            return false
+        }
+
+        if (checkInDateParsed == null || checkOutDateParsed == null || checkOutDateParsed <= checkInDateParsed) {
+            println("올바른 날짜 형식이 아닙니다. 다시 입력해주세요.")
+            return false
+        }
+
+        val currentDate = Date()
+        if (checkInDateParsed <= currentDate || checkOutDateParsed <= currentDate) {
+            println("체크인 또는 체크아웃 날짜가 오늘 이전입니다. 다시 입력해주세요.")
+            return false
+        }
+
+        for (reservation in reservations) {
+            if (reservation.roomNumber != roomNumber) {
+                val existingCheckIn = reservation.checkInDate
+                val existingCheckOut = reservation.checkOutDate
+
+                if ((checkInDateParsed >= existingCheckIn && checkInDateParsed <= existingCheckOut) ||
+                    (checkOutDateParsed >= existingCheckIn && checkOutDateParsed <= existingCheckOut) ||
+                    (checkInDateParsed <= existingCheckIn && checkOutDateParsed >= existingCheckOut)
+                ) {
+                    println("해당 기간에 방이 이미 예약되었습니다. 다른 방번호 또는 날짜를 선택해주세요.")
+                    return false
+                }
+            }
+        }
+
+        val totalPrice = calculateTotalPrice(checkInDateParsed, checkOutDateParsed)
+        val randomAmount = calculateRandomAmount(totalPrice)
+
+        return true
+    }
+
+    fun parseDate(dateString: String): Date {
+        val format = SimpleDateFormat("yyyyMMdd")
+        format.isLenient = false
+
+        return try {
+            format.parse(dateString) ?: Date(0)
+        } catch (e: Exception) {
+            Date(0)
+        }
+    }
+
+    fun formatDate(date: Date): String {
+        val format = SimpleDateFormat("yyyyMMdd")
+        return format.format(date)
+    }
+}
+
+fun main() {
+    val reservation = Reservation()
+    val reservations = mutableListOf<ReservationData>()
+    var roomNumber: Int?
+    var checkInDate: Date? = null
+    var checkOutDate: Date? = null
+
+    println("호텔예약 프로그램 입니다.")
+    println("[메뉴]")
+    println("1. 방예약, 2. 예약목록 출력, 3. 예약목록(정렬) 출력, 4. 시스템 종료, 5. 금액 입금-출금 내역 목록, 6. 예약 변경/취소")
+
+    while (true) {
+        print("메뉴를 선택하세요: ")
+        println("1. 방예약, 2. 예약목록 출력, 3. 예약목록(정렬) 출력, 4. 시스템 종료, 5. 금액 입금-출금 내역 목록, 6. 예약 변경/취소")
+        val menuOption = readLine()?.toIntOrNull()
+
+        when (menuOption) {
+            1 -> {
+                println("예약자분의 성함을 입력해주세요: ")
+                val name = readLine() ?: ""
+
+                while (true) {
+                    println("예약할 방번호를 입력해주세요 (방번호는 100~999까지의 영역을 가집니다.): ")
+                    val roomNumberInput = readLine()
+                    roomNumber = roomNumberInput?.toIntOrNull()
+
+                    if (roomNumber == null) {
+                        println("올바르지 않은 방번호 입니다. 다시 입력해주세요.")
+                    } else if (roomNumber !in 100..999) {
+                        println("방번호는 100부터 999 사이의 값이어야 합니다. 다시 입력해주세요.")
+                    } else {
+                        while (true) {
+                            println("체크인 날짜를 입력해주세요 (표기형식, 20230720): ")
+                            checkInDate = reservation.parseDate(readLine() ?: "")
+                            if (checkInDate == null) {
+                                println("잘못된 날짜 형식입니다. 날짜는 20230720과 같은 형식으로 입력해주세요.")
+                            } else if (checkInDate <= Date()) {
+                                println("체크인은 오늘 이후로만 가능합니다. 다시 입력해주세요.")
+                            } else {
+                                break
+                            }
+                        }
+                        break
+                    }
+                }
+
+                while (true) {
+                    println("체크아웃 날짜를 입력해주세요 (표기형식, 20230720): ")
+                    checkOutDate = reservation.parseDate(readLine() ?: "")
+                    if (checkOutDate == null) {
+                        println("잘못된 날짜 형식입니다. 날짜는 20230720과 같은 형식으로 입력해주세요.")
+                    } else if (checkOutDate <= checkInDate) {
+                        println("체크아웃 날짜는 체크인 날짜보다 미래여야 합니다. 다시 입력해주세요.")
+                    } else {
+                        break
+                    }
+                }
+
+                if (reservation.validateInput(
+                        name,
+                        roomNumber.toString(),
+                        reservation.formatDate(checkInDate ?: Date()),
+                        reservation.formatDate(checkOutDate ?: Date()),
+                        reservations
+                    )
+                ) {
+
+                    println("호텔 예약이 완료되었습니다.")
+                    val totalPrice = reservation.calculateTotalPrice(checkInDate!!, checkOutDate!!)
+                    val randomAmount = reservation.calculateRandomAmount(totalPrice)
+                    reservations.add(
+                        ReservationData(
+                            name,
+                            roomNumber.toString(),
+                            checkInDate,
+                            checkOutDate,
+                            totalPrice,
+                            randomAmount
+                        )
+                    )
+                } else {
+                    println("예약에 실패했습니다.")
+                }
+            }
+
+            2 -> {
+                if (reservations.isEmpty()) {
+                    println("예약 목록이 없습니다.")
+                } else {
+                    println("[예약목록]")
+                    for (res in reservations) {
+                        println("예약자분의 성함: ${res.name}, 방번호: ${res.roomNumber}, 체크인 날짜: ${reservation.formatDate(res.checkInDate)}, 체크아웃 날짜: ${reservation.formatDate(res.checkOutDate)}")
+                    }
+                }
+            }
+
+            3 -> {
+                if (reservations.isEmpty()) {
+                    println("예약 목록이 없습니다.")
+                } else {
+                    println("[예약목록 (체크인 날짜 순)]")
+                    val sortedReservations = reservations.sortedBy { it.checkInDate } // 체크인 날짜를 기준으로 정렬
+                    for (res in sortedReservations) {
+                        println("예약자분의 성함: ${res.name}, 방번호: ${res.roomNumber}, 체크인 날짜: ${reservation.formatDate(res.checkInDate)}, 체크아웃 날짜: ${reservation.formatDate(res.checkOutDate)}")
+                    }
+                }
+            }
+
+            4 -> {
+                println("프로그램을 종료합니다.")
+                return
+            }
+
+            5 -> {
+                println("조회하실 사용자 이름을 입력하세요: ")
+                val nameToSearch = readLine() ?: ""
+                var foundReservation = false
+
+                for (res in reservations) {
+                    if (res.name == nameToSearch) {
+                        println("초기 금액으로 ${res.randomAmount}원 입금되었습니다.")
+                        println("예약금으로 ${res.totalPrice}원 출금되었습니다.")
+                        foundReservation = true
+                        break
+                    }
+                }
+
+                if (!foundReservation) {
+                    println("해당 사용자의 예약 정보가 존재하지 않습니다.")
+                }
+            }
+
+            6 -> {
+                println("예약을 변경할 사용자 이름을 입력하세요: ")
+                val nameToModify = readLine() ?: ""
+                var foundReservations = mutableListOf<ReservationData>()
+
+
+                for (res in reservations) {
+                    if (res.name == nameToModify) {
+                        foundReservations.add(res)
+                    }
+                }
+
+                if (foundReservations.isEmpty()) {
+                    println("해당 사용자의 예약 정보가 존재하지 않습니다.")
+                } else {
+                    println("[예약 목록]")
+                    for ((index, res) in foundReservations.withIndex()) {
+                        println("${index + 1}. 사용자 이름: ${res.name}, 방번호: ${res.roomNumber}, 체크인 날짜: ${reservation.formatDate(res.checkInDate)}, 체크아웃 날짜: ${reservation.formatDate(res.checkOutDate)}")
+                    }
+
+                    println("예약을 변경할 번호를 선택하세요 (1부터 ${foundReservations.size}까지): ")
+                    val choice = readLine()?.toIntOrNull()
+
+                    if (choice != null && choice in 1..foundReservations.size) {
+                        val selectedReservation = foundReservations[choice - 1]
+
+                        println("해당 예약을 어떻게 하시겠습니까?")
+                        println("1. 변경, 2. 취소, 그 외 번호. 메뉴로 돌아가기")
+                        val actionChoice = readLine()?.toIntOrNull()
+
+                        when (actionChoice) {
+                            1 -> {
+                                println("변경할 방번호를 입력하세요 (방번호는 100~999까지의 영역을 가집니다.): ")
+                                val newRoomNumberInput = readLine()
+                                val newRoomNumber = newRoomNumberInput?.toIntOrNull()
+
+                                if (newRoomNumber == null) {
+                                    println("올바르지 않은 방번호 입니다. 변경이 취소됩니다.")
+                                } else if (newRoomNumber !in 100..999) {
+                                    println("방번호는 100부터 999 사이의 값이어야 합니다. 변경이 취소됩니다.")
+                                } else {
+                                    selectedReservation.roomNumber = newRoomNumber.toString()
+
+                                    println("체크인 날짜를 입력해주세요 (표기형식, 20230720): ")
+                                    val newCheckInDate = reservation.parseDate(readLine() ?: "")
+                                    if (newCheckInDate == null || newCheckInDate <= Date()) {
+                                        println("잘못된 날짜 형식 또는 체크인은 오늘 이후로만 가능합니다. 변경이 취소됩니다.")
+                                    } else {
+                                        selectedReservation.checkInDate = newCheckInDate
+
+                                        println("체크아웃 날짜를 입력해주세요 (표기형식, 20230720): ")
+                                        val newCheckOutDate = reservation.parseDate(readLine() ?: "")
+                                        if (newCheckOutDate == null || newCheckOutDate <= newCheckInDate) {
+                                            println("잘못된 날짜 형식 또는 체크아웃 날짜는 체크인 날짜보다 미래여야 합니다. 변경이 취소됩니다.")
+                                        } else {
+                                            selectedReservation.checkOutDate = newCheckOutDate
+
+                                            if (reservation.validateInput(
+                                                    selectedReservation.name,
+                                                    selectedReservation.roomNumber,
+                                                    reservation.formatDate(selectedReservation.checkInDate),
+                                                    reservation.formatDate(selectedReservation.checkOutDate),
+                                                    reservations
+                                                )
+                                            ) {
+                                                foundReservations[choice - 1] = selectedReservation
+                                                println("예약이 변경되었습니다.")
+                                            } else {
+                                                println("예약 변경에 실패했습니다. 변경된 내용을 다시 확인해주세요.")
+
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            2 -> {
+                                reservations.remove(selectedReservation)
+                                println("[취소 유의사항]")
+                                println("체크인 3일 이전 취소 예약금 환불 불가")
+                                println("체크인 5일 이전 취소 예약금의 30% 환불")
+                                println("체크인 7일 이전 취소 예약금의 50% 환불")
+                                println("체크인 14일 이전 취소 예약금의 80% 환불")
+                                println("[체크인 30일 이전 취소 예약금의 100% 환불")
+                                println("취소가 완료되었습니다.")
+                            }
+
+                            else -> {
+                                println("메뉴로 돌아갑니다.")
+                                return
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
